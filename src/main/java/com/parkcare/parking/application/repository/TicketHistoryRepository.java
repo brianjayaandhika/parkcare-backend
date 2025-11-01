@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TicketHistoryRepository extends JpaRepository<TicketHistory, String>, JpaSpecificationExecutor<TicketHistory> {
 
+    Boolean existsByPlateNumber(String plateNumber);
+
 }

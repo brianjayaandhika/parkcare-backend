@@ -9,17 +9,23 @@ import com.parkcare.parking.application.model.CheckOutResponse;
 import com.parkcare.parking.application.repository.TicketHistoryRepository;
 import com.parkcare.parking.application.repository.VehicleRepository;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class VehicleService {
 
     @Autowired
@@ -34,10 +40,15 @@ public class VehicleService {
     @Autowired
     private TicketHistoryRepository ticketHistoryRepository;
 
-    private Integer calculateParkingPrice(Instant checkInAt, Instant checkOutAt) {
-        Integer diff = (int) checkOutAt.until(checkInAt, ChronoUnit.HOURS);
+    private final Clock clock;
 
-        return ratePerHour * diff;
+    private int calculateParkingPrice(Instant checkInAt, Instant checkOutAt) {
+        long seconds = Duration.between(checkInAt, checkOutAt).getSeconds();
+        long hours = (long) Math.ceil(seconds / 3600.0);
+        log.info("debug-hours" + hours);
+        log.info("debug-checkOutAt" + checkOutAt);
+        log.info("debug-checkInAt" + checkInAt);
+        return (int) (ratePerHour * Math.max(hours, 1));
     }
 
     @Transactional
@@ -53,7 +64,7 @@ public class VehicleService {
         Vehicle vehicle = new Vehicle();
         vehicle.setId(UUID.randomUUID().toString());
         vehicle.setPlateNumber(request.getPlateNumber());
-        vehicle.setCheckInAt(Instant.now());
+        vehicle.setCheckInAt(Instant.now(clock));
 
         vehicleRepository.save(vehicle);
 
@@ -74,8 +85,10 @@ public class VehicleService {
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehicle Not Found")
         );
 
-        Instant now = Instant.now();
+        Instant now = Instant.now(clock);
         Integer totalPrice = calculateParkingPrice(vehicle.getCheckInAt(), now);
+        log.info("debug-totalPrice: " + totalPrice);
+        log.info("debug-ratePerHour: " + ratePerHour);
 
         vehicle.setCheckOutAt(now);
         vehicle.setPrice(totalPrice);
