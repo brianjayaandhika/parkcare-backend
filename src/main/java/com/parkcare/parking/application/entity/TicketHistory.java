@@ -33,4 +33,7 @@ public class TicketHistory {
 
     @Column(name = "rate_per_hour")
     private Integer ratePerHour;
+
+    @Column(name = "id_reference")
+    private String idReference;
 }

@@ -12,12 +12,12 @@ import lombok.Setter;
 import java.time.Instant;
 
 @Entity
-@Table(name = "vehicles")
+@Table(name = "tickets")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Vehicle {
+public class Ticket {
 
     @Id
     private String id;

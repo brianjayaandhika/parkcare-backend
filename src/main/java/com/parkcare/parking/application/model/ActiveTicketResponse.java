@@ -11,7 +11,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CheckInResponse {
+public class ActiveTicketResponse {
 
     private String id;
     private String plateNumber;
