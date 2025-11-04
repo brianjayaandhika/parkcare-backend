@@ -43,6 +43,19 @@ Response Body:
 }
 ```
 
+## Get Ticket Detail
+Endpoint : GET /api/tickets-history/{plateNumber}
+
+Response Body:
+
+```json
+  {
+    "id": "random string uuid",
+    "plateNumber": "B 1234 XYZ",
+    "checkInAt": "2025-10-21T09:00:00Z"
+  }
+```
+
 ## Get All Active Tickets
 Endpoint : GET /api/tickets
 
@@ -92,4 +105,6 @@ Response Body:
   }
 ]
 ```
+
+
 
